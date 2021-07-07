@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/myImage">
+        <file>image/image.jpg</file>
+        <file>image/MoJa.png</file>
+        <file>image/Up.png</file>
+        <file>image/Down.png</file>
+        <file>image/Commit.png</file>
+        <file>image/Delete.png</file>
+        <file>image/Save.png</file>
+        <file>image/Down_Black.png</file>
+        <file>image/Up_Black .png</file>
+    </qresource>
+</RCC>

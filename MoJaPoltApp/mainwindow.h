@@ -37,6 +37,8 @@ private slots:
 
     void on_downButton_clicked();
 
+    void on_loadButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     int count;

@@ -415,3 +415,55 @@ void MainWindow::on_downButton_clicked()
                                      QMessageBox::Yes);
     }
 }
+
+void MainWindow::on_loadButton_clicked()
+{
+    strList.clear();
+
+    QFile file;
+    file.setFileName(QFileDialog::getOpenFileName(this, QString("载入路径"), QString("/"),QString("TEXT(*.json)")));
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QByteArray bytes = file.readAll();
+    file.close();
+
+    QString temp_str = bytes;
+    QList<QString> json_list = temp_str.replace("{\"MoJa\":[", "").replace("]}", "").split("},");
+
+    for(int i = 0; i < json_list.size(); i++)
+    {
+        if (i == json_list.size() - 1)
+        {
+            json_list[i] = json_list[i];
+        }
+        else
+        {
+            json_list[i] = json_list[i] + "}";
+        }
+    }
+
+    foreach (QString var, json_list) {
+        strList.push_back(var);
+    }
+
+    this->point_Index = json_list.size() - 1;
+    this->count = json_list.size();
+
+    QList<QString> tempList;
+    tempList = parseString(strList[this->point_Index]);
+
+    ui->label_16->setStyleSheet("color:rgb(0,255,255)");
+    ui->label_17->setStyleSheet("color:rgb(0,255,255)");
+    ui->label_18->setStyleSheet("color:rgb(0,255,255)");
+    ui->label_19->setStyleSheet("color:rgb(0,255,255)");
+    ui->label_20->setStyleSheet("color:rgb(0,255,255)");
+    ui->label_21->setStyleSheet("color:rgb(0,255,255)");
+    ui->label_22->setStyleSheet("color:rgb(0,255,255)");
+    ui->label_16->setText(tempList[0]);
+    ui->label_17->setText(tempList[1]);
+    ui->label_18->setText(tempList[2]);
+    ui->label_19->setText(tempList[3]);
+    ui->label_20->setText(tempList[4]);
+    ui->label_21->setText(tempList[6]);
+    ui->label_22->setText(tempList[7]);
+
+}

@@ -9,5 +9,6 @@
         <file>image/Save.png</file>
         <file>image/Down_Black.png</file>
         <file>image/Up_Black .png</file>
+        <file>image/Load.png</file>
     </qresource>
 </RCC>

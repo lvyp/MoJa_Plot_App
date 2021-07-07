@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     int height = this->geometry().height();
     this->setFixedSize(width,height); //设置窗体固定大小
 
+    strList.clear();
     this->count = 0;
     this->point_Index = 0;
     this->delete_offset = 0;
@@ -113,17 +114,27 @@ void MainWindow::initLabel()
 void MainWindow::on_commitButton_clicked()
 {
 
-    if (ui->lineEdit->text().isEmpty() && ui->lineEdit_2->text().isEmpty()
-            && ui->lineEdit_3->text().isEmpty() && ui->lineEdit_4->text().isEmpty())
+    if (ui->lineEdit->text().isEmpty() ||( ui->lineEdit_2->text().isEmpty()
+            && ui->lineEdit_3->text().isEmpty() && ui->lineEdit_4->text().isEmpty()))
     {
-        QMessageBox::warning(this, tr("Waring"),
-                                     tr("大聪明啊！！!\r\n时间点一个都不填想啥呢！！"),
-                                     QMessageBox::Yes);
+        if (ui->lineEdit->text().isEmpty())
+        {
+            QMessageBox::warning(this, tr("Waring"),
+                                         tr("大聪明啊！！!\r\n时间轴时间必须填写！！"),
+                                         QMessageBox::Yes);
+        }
+        else
+        {
+            QMessageBox::warning(this, tr("Waring"),
+                                         tr("大聪明啊！！!\r\n小竹、老竹、对话内容最少也得填一个啊！！"),
+                                         QMessageBox::Yes);
+        }
+
     }
     else
     {
         this->count += 1;
-        this->point_Index = this->count;
+        this->point_Index += 1;
         if (ui->lineEdit->text().isEmpty())
         {
             ui->lineEdit->setText("0.000");
@@ -140,6 +151,7 @@ void MainWindow::on_commitButton_clicked()
         }
 
         char * AudioName_char = "";
+        char FileDirPath[100] = {"./tts/"};
         if (ui->comboBox_4->currentText().contains("无",Qt::CaseSensitive))
         {
             //不生成tts文件
@@ -147,10 +159,14 @@ void MainWindow::on_commitButton_clicked()
         else if(ui->comboBox_4->currentText().contains("小竹",Qt::CaseSensitive))
         {
             AudioName_char = TTSVedio(ui->lineEdit_4->text(), 4);
+            strcat(FileDirPath, AudioName_char);
+            strcpy(AudioName_char, FileDirPath);
         }
         else
         {
             AudioName_char = TTSVedio(ui->lineEdit_4->text(), 3);
+            strcat(FileDirPath, AudioName_char);
+            strcpy(AudioName_char, FileDirPath);
         }
 
         QString AudioName_str(AudioName_char);
@@ -177,7 +193,14 @@ void MainWindow::on_commitButton_clicked()
                     sub_time_old_str + action_old_str + dialogue_str +
                     dialogue_content_str + current_human_str + "}";
 
-            strList.push_back(sum_str);
+            if (this->point_Index == this->count)
+            {
+                strList.push_back(sum_str);
+            }
+            else
+            {
+                strList.insert(this->point_Index, sum_str);
+            }
 
             ui->lineEdit->clear();
             ui->lineEdit_2->clear();
@@ -229,7 +252,7 @@ void MainWindow::on_saveButton_clicked()
     json_str = "{\"MoJa\":[" + json_str + "]}";
 
     QFile file;
-    file.setFileName(QFileDialog::getSaveFileName(this, QString("保存路径"), QString("/"),QString("TEXT(*.txt)")));
+    file.setFileName(QFileDialog::getSaveFileName(this, QString("保存路径"), QString("/"),QString("TEXT(*.json)")));
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     file.write(json_str.toUtf8());
     file.close();
@@ -251,7 +274,7 @@ QList<QString> MainWindow::parseString(QString str)
 void MainWindow::on_deleteButton_clicked()
 {
 
-    if (this->point_Index >= 0)
+    if (!strList.isEmpty())
     {
 
         if (this->point_Index == this->count)
@@ -269,7 +292,11 @@ void MainWindow::on_deleteButton_clicked()
         QList<QString> resultList;
         QString audioFileName = parseString(strList[this->point_Index])[5];
         resultList = audioFileName.split(":");
-        strcat(audioName, resultList[1].replace("\"","").toStdString().data());
+        QString temp = resultList[1].replace("\"","");
+        QList<QString> tempList = temp.split("/");
+        const char* audioNameNoHavePath = tempList.last().toStdString().data();
+        //const char* audioNameNoHavePath = resultList[1].replace("\"","").split("/")[-1].toStdString().data();
+        strcat(audioName, audioNameNoHavePath);
 
         strList.removeAt(this->point_Index);
 
